@@ -1,49 +1,15 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-
-Kickstart.nvim is *not* a distribution.
-
-Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
-
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
---]]
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Install package manager
+-- Required by nvim-tree
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Vafgnyy cnpxntr znantre
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -67,9 +33,45 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
-  -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
+
+  'sindrets/diffview.nvim',
+  'nvim-tree/nvim-web-devicons',
+
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
+    opts = {},
+    config = true
+  },
+
+  {
+    'kylechui/nvim-surround',
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
+    opts = {},
+    config = true
+  },
+
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim",         -- required
+      "nvim-telescope/telescope.nvim", -- optional
+      "sindrets/diffview.nvim",        -- optional
+      "ibhagwan/fzf-lua",              -- optional
+    },
+    config = true
+  },
+
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
@@ -86,7 +88,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
+      { 'j-hui/fidget.nvim',       tag = 'legacy', opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -110,7 +112,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -128,16 +130,16 @@ require('lazy').setup({
 
         -- don't override the built-in and fugitive keymaps
         local gs = package.loaded.gitsigns
-        vim.keymap.set({'n', 'v'}, ']c', function()
+        vim.keymap.set({ 'n', 'v' }, ']c', function()
           if vim.wo.diff then return ']c' end
           vim.schedule(function() gs.next_hunk() end)
           return '<Ignore>'
-        end, {expr=true, buffer = bufnr, desc = "Jump to next hunk"})
-        vim.keymap.set({'n', 'v'}, '[c', function()
+        end, { expr = true, buffer = bufnr, desc = "Jump to next hunk" })
+        vim.keymap.set({ 'n', 'v' }, '[c', function()
           if vim.wo.diff then return '[c' end
           vim.schedule(function() gs.prev_hunk() end)
           return '<Ignore>'
-        end, {expr=true, buffer = bufnr, desc = "Jump to previous hunk"})
+        end, { expr = true, buffer = bufnr, desc = "Jump to previous hunk" })
       end,
     },
   },
@@ -267,7 +269,48 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+function vim.getVisualSelection()
+  vim.cmd('noau normal! "vy"')
+  local text = vim.fn.getreg('v')
+  vim.fn.setreg('v', {})
+
+  text = string.gsub(text, "\n", "")
+  if #text > 0 then
+    return text
+  else
+    return ''
+  end
+end
+
 -- [[ Basic Keymaps ]]
+
+-- MINE
+vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
+vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
+vim.keymap.set('n', '<leader>oo', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+-- WINDOWS
+vim.keymap.set("n", "<leader>wh", "<c-w>h", { desc = "Window left" })
+vim.keymap.set("n", "<leader>wl", "<c-w>l", { desc = "Window right" })
+vim.keymap.set("n", "<leader>wj", "<c-w>j", { desc = "Window down" })
+vim.keymap.set("n", "<leader>wk", "<c-w>k", { desc = "Window up" })
+vim.keymap.set("n", "<leader>wd", "<c-w>q", { desc = "Window delete" })
+-- BUFFERS
+vim.keymap.set("n", "<leader>bl", "<CMD>bprev<CR>", { desc = "Last buffer" })
+vim.keymap.set("n", "<leader>bb", "<CMD>Telescope buffers<CR>", { desc = "Find buffer" })
+vim.keymap.set("n", "<leader>bd", "<CMD>bdelete<CR>", { desc = "Delete buffer" })
+-- FILES
+vim.keymap.set("n", "<leader>fs", ":w<CR>", { desc = "Save file" })
+vim.keymap.set('n', '<leader>ff', "<CMD>Format<CR>", { desc = 'Format file' })
+vim.keymap.set('n', '<leader>pf', "<CMD>Telescope find_files<CR>", { desc = 'Project files' })
+-- SEARCH
+vim.keymap.set('n', '<leader>ss', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
+vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+vim.keymap.set('n', '<leader>*', '<CMD>Telescope grep_string<CR>', { desc = 'Search project for word under cursor' })
+vim.keymap.set('v', '<leader>*', function()
+  local text = vim.getVisualSelection()
+  require('telescope.builtin').live_grep({ default_text = text })
+end, { desc = 'Search project for selected text' })
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
@@ -327,7 +370,8 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
+    'zig' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
