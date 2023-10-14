@@ -31,10 +31,6 @@ vim.opt.rtp:prepend(lazypath)
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
 
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
@@ -148,6 +144,9 @@ require('lazy').setup({
     -- Theme inspired by Atom
     'navarasu/onedark.nvim',
     priority = 1000,
+    opts = {
+        style = 'dark'
+    },
     config = function()
       vim.cmd.colorscheme 'onedark'
     end,
@@ -172,12 +171,8 @@ require('lazy').setup({
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
-    config = function()
-      require('ibl').setup {
-        char = '┊',
-        show_trailing_blankline_indent = false,
-      }
-    end,
+    main = "ibl",
+    opts = {}
   },
 
   -- "gc" to comment visual regions/lines
@@ -285,9 +280,10 @@ end
 -- [[ Basic Keymaps ]]
 
 -- MINE
+vim.keymap.set('v', 'p', '<s-p>', { desc = 'Paste' }) -- paste not override register
 vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
 vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
-vim.keymap.set('n', '<leader>oo', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 -- WINDOWS
 vim.keymap.set("n", "<leader>wh", "<c-w>h", { desc = "Window left" })
@@ -296,9 +292,12 @@ vim.keymap.set("n", "<leader>wj", "<c-w>j", { desc = "Window down" })
 vim.keymap.set("n", "<leader>wk", "<c-w>k", { desc = "Window up" })
 vim.keymap.set("n", "<leader>wd", "<c-w>q", { desc = "Window delete" })
 -- BUFFERS
-vim.keymap.set("n", "<leader>bl", "<CMD>bprev<CR>", { desc = "Last buffer" })
+vim.keymap.set("n", "<leader>bl", "<c-^>", { desc = "Last buffer" })
 vim.keymap.set("n", "<leader>bb", "<CMD>Telescope buffers<CR>", { desc = "Find buffer" })
 vim.keymap.set("n", "<leader>bd", "<CMD>bdelete<CR>", { desc = "Delete buffer" })
+vim.keymap.set("n", "<leader>bc", "<CMD>%bd | e# | bd# <CR>", { desc = "Clean up buffers" })
+vim.keymap.set("n", "<leader>bK", "<CMD>bdelete!<CR>", { desc = "Force kill a buffer" })
+vim.keymap.set("n", "<leader>bs", "<CMD>enew<CR>", { desc = "Scratch buffer" })
 -- FILES
 vim.keymap.set("n", "<leader>fs", ":w<CR>", { desc = "Save file" })
 vim.keymap.set('n', '<leader>ff', "<CMD>Format<CR>", { desc = 'Format file' })
