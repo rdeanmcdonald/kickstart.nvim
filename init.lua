@@ -35,6 +35,8 @@ require('lazy').setup({
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
 
+  'ziglang/zig.vim',
+
   {
     "windwp/nvim-autopairs",
     -- Optional dependency
@@ -556,6 +558,14 @@ mason_lspconfig.setup_handlers {
     }
   end
 }
+
+local lspconfig = require('lspconfig')
+local servers2 = {'zls'}
+for _, lsp in ipairs(servers2) do
+    lspconfig[lsp].setup {
+        on_attach = on_attach,
+    }
+end
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
