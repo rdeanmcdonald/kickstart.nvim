@@ -32,11 +32,10 @@ vim.opt.rtp:prepend(lazypath)
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
 
+  -- START MINE
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
-
   'ziglang/zig.vim',
-
   {
     "windwp/nvim-autopairs",
     -- Optional dependency
@@ -59,7 +58,6 @@ require('lazy').setup({
     opts = {},
     config = true
   },
-
   {
     'kylechui/nvim-surround',
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -67,7 +65,6 @@ require('lazy').setup({
     opts = {},
     config = true
   },
-
   {
     "NeogitOrg/neogit",
     dependencies = {
@@ -78,17 +75,92 @@ require('lazy').setup({
     },
     config = true
   },
-
   {
     'stevearc/oil.nvim',
     opts = {},
     -- Optional dependencies
     dependencies = { "nvim-tree/nvim-web-devicons" },
   },
+  "tpope/vim-abolish",
+  {
+    "scalameta/nvim-metals",
+    ft = { "scala", "sbt" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      -- Metals
+      -- https://github.com/scalameta/nvim-metals/discussions/39
+      local metals_config = require("metals").bare_config()
+
+      metals_config.settings = {
+        showImplicitArguments = true,
+        showImplicitConversionsAndClasses = true,
+        showInferredType = true,
+        superMethodLensesEnabled = true,
+      }
+      metals_config.init_options.statusBarProvider = "on"
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+      metals_config.capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+      local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "scala", "sbt" },
+        callback = function()
+          require("metals").initialize_or_attach(metals_config)
+        end,
+        group = nvim_metals_group,
+      })
+    end,
+  },
+  {
+    "folke/styler.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("styler").setup {
+        themes = {
+          -- markdown = { colorscheme = "gruvbox" },
+          -- help = { colorscheme = "gruvbox" },
+        },
+      }
+    end,
+  },
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "night",
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
+    config = function(_, opts)
+      local tokyonight = require "tokyonight"
+      tokyonight.setup(opts)
+      tokyonight.load()
+    end,
+  },
+  {
+    "catppuccin/nvim",
+    lazy = false,
+    name = "catppuccin",
+  },
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = false,
+    config = function()
+      require("gruvbox").setup()
+    end,
+  },
+  -- END MINE
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
-  'tpope/vim-abolish',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -159,17 +231,18 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    opts = {
-      style = 'dark'
-    },
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
+  -- {
+  --   -- Theme inspired by Atom
+  --   'navarasu/onedark.nvim',
+  --   priority = 1000,
+  --   opts = {
+  --     style = 'dark',
+  --     transparent = true,
+  --   },
+  --   config = function()
+  --     vim.cmd.colorscheme 'onedark'
+  --   end,
+  -- },
 
   {
     -- Set lualine as statusline
@@ -187,6 +260,9 @@ require('lazy').setup({
           {
             'filename',
             path = 1
+          },
+          {
+            'g:metals_status',
           }
         }
       },
@@ -306,7 +382,7 @@ end
 
 -- [[ Basic Keymaps ]]
 
--- MINE
+-- START MINE
 vim.keymap.set('v', 'p', '<s-p>', { desc = 'Paste' }) -- paste not override register
 vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
 vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
@@ -319,7 +395,10 @@ vim.keymap.set("n", "<leader>wj", "<c-w>j", { desc = "Window down" })
 vim.keymap.set("n", "<leader>wk", "<c-w>k", { desc = "Window up" })
 vim.keymap.set("n", "<leader>wd", "<c-w>q", { desc = "Window delete" })
 -- BUFFERS
-vim.keymap.set("n", "<leader>bl", "<c-^>", { desc = "Last buffer" })
+-- vim.keymap.set("n", "<leader>bl", "<c-^>", { desc = "Last buffer" })
+vim.keymap.set('n', '<leader>bl', function()
+  require('telescope.builtin').buffers({ sort_mru = true, ignore_current_buffer = true, })
+end, { desc = 'Last buffer (first in the list)' })
 vim.keymap.set("n", "<leader>bb", "<CMD>Telescope buffers<CR>", { desc = "Find buffer" })
 vim.keymap.set("n", "<leader>bd", "<CMD>bdelete<CR>", { desc = "Delete buffer" })
 vim.keymap.set("n", "<leader>bc", "<CMD>%bd | e# | bd# <CR>", { desc = "Clean up buffers" })
@@ -337,6 +416,7 @@ vim.keymap.set('v', '<leader>*', function()
   local text = vim.getVisualSelection()
   require('telescope.builtin').live_grep({ default_text = text })
 end, { desc = 'Search project for selected text' })
+-- END MINE
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
@@ -560,11 +640,11 @@ mason_lspconfig.setup_handlers {
 }
 
 local lspconfig = require('lspconfig')
-local servers2 = {'zls'}
+local servers2 = { 'zls' }
 for _, lsp in ipairs(servers2) do
-    lspconfig[lsp].setup {
-        on_attach = on_attach,
-    }
+  lspconfig[lsp].setup {
+    on_attach = on_attach,
+  }
 end
 
 -- [[ Configure nvim-cmp ]]
@@ -625,6 +705,7 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
   pattern = { "*" },
   command = "normal zx zR",
 })
+-- END MINE
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
