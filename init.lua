@@ -133,7 +133,7 @@ require('lazy').setup({
     priority = 1000,
     opts = {
       style = "night",
-      transparent = true,
+      transparent = false,
       styles = {
         sidebars = "transparent",
         floats = "transparent",
@@ -397,7 +397,7 @@ vim.keymap.set("n", "<leader>wd", "<c-w>q", { desc = "Window delete" })
 -- BUFFERS
 -- vim.keymap.set("n", "<leader>bl", "<c-^>", { desc = "Last buffer" })
 vim.keymap.set('n', '<leader>bl', function()
-  require('telescope.builtin').buffers({ sort_mru = true, ignore_current_buffer = true, })
+  require('telescope.builtin').buffers({ sort_mru = true, ignore_current_buffer = true })
 end, { desc = 'Last buffer (first in the list)' })
 vim.keymap.set("n", "<leader>bb", "<CMD>Telescope buffers<CR>", { desc = "Find buffer" })
 vim.keymap.set("n", "<leader>bd", "<CMD>bdelete<CR>", { desc = "Delete buffer" })
@@ -441,6 +441,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
+    layout_strategy = 'vertical',
+    layout_config = { width = 0.95, height = 0.95, preview_cutoff = 2 },
     mappings = {
       i = {
         ['<C-u>'] = false,
