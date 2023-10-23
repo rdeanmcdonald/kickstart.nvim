@@ -51,13 +51,26 @@ require('lazy').setup({
       )
     end,
   },
+  "MunifTanjim/nui.nvim",
   {
-    'nvim-tree/nvim-tree.lua',
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = 'VeryLazy',
-    opts = {},
-    config = true
+    "nvim-neo-tree/neo-tree.nvim",
+    version = "*",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      require('neo-tree').setup({})
+    end,
   },
+  -- {
+  --   'nvim-tree/nvim-tree.lua',
+  --   version = "*", -- Use for stability; omit to use `main` branch for the latest features
+  --   event = 'VeryLazy',
+  --   opts = {},
+  --   config = true
+  -- },
   {
     'kylechui/nvim-surround',
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -88,32 +101,6 @@ require('lazy').setup({
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    config = function()
-      -- Metals
-      -- https://github.com/scalameta/nvim-metals/discussions/39
-      local metals_config = require("metals").bare_config()
-
-      metals_config.settings = {
-        showImplicitArguments = true,
-        showImplicitConversionsAndClasses = true,
-        showInferredType = true,
-        superMethodLensesEnabled = true,
-      }
-      metals_config.init_options.statusBarProvider = "on"
-
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-      metals_config.capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-      local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "scala", "sbt" },
-        callback = function()
-          require("metals").initialize_or_attach(metals_config)
-        end,
-        group = nvim_metals_group,
-      })
-    end,
   },
   {
     "folke/styler.nvim",
@@ -386,8 +373,9 @@ end
 vim.keymap.set('v', 'p', '<s-p>', { desc = 'Paste' }) -- paste not override register
 vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
 vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
-vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
-vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+vim.keymap.set('n', '<leader>o', '<CMD>Neotree filesystem reveal left<CR>', { desc = 'Open neotree' })
+vim.keymap.set('n', '<leader>c', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open oil" })
 -- WINDOWS
 vim.keymap.set("n", "<leader>wh", "<c-w>h", { desc = "Window left" })
 vim.keymap.set("n", "<leader>wl", "<c-w>l", { desc = "Window right" })
@@ -479,7 +467,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
   ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-    'zig', 'terraform' },
+    'zig', 'terraform', 'scala' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -641,14 +629,6 @@ mason_lspconfig.setup_handlers {
   end
 }
 
-local lspconfig = require('lspconfig')
-local servers2 = { 'zls' }
-for _, lsp in ipairs(servers2) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-  }
-end
-
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
@@ -702,11 +682,45 @@ cmp.setup {
 -- Folding with treesitter
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.startofline = false
+
 -- File opens as folded by default for some reason, so need to unfold with this
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
   pattern = { "*" },
   command = "normal zx zR",
 })
+
+-- Metals
+local metals_config = require("metals").bare_config()
+
+metals_config.settings = {
+  showImplicitArguments = true,
+  showImplicitConversionsAndClasses = true,
+  showInferredType = true,
+  superMethodLensesEnabled = true,
+  -- metalsBinaryPath = "/Users/richardmcdonald/Library/Application Support/Coursier/bin/metals",
+}
+metals_config.init_options.statusBarProvider = "on"
+metals_config.capabilities = capabilities
+metals_config.on_attach = on_attach
+
+local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "scala", "sbt" },
+  callback = function()
+    require("metals").initialize_or_attach(metals_config)
+  end,
+  group = nvim_metals_group,
+})
+
+local lspconfig = require("lspconfig")
+local servers2 = { "zls" }
+for _, lsp in ipairs(servers2) do
+  lspconfig[lsp].setup {
+    on_attach = on_attach,
+  }
+end
+
 -- END MINE
 
 -- The line beneath this is called `modeline`. See `:help modeline`
