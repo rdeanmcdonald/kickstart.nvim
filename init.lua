@@ -395,7 +395,7 @@ vim.keymap.set("n", "<leader>bs", "<CMD>enew<CR>", { desc = "Scratch buffer" })
 -- FILES
 vim.keymap.set("n", "<leader>fs", ":w<CR>", { desc = "Save file" })
 vim.keymap.set('n', '<leader>ff', "<CMD>Format<CR>", { desc = 'Format file' })
-vim.keymap.set('n', '<leader>pf', "<CMD>Telescope find_files<CR>", { desc = 'Project files' })
+vim.keymap.set('n', '<leader>pf', "<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>", { desc = 'Project files' })
 -- SEARCH
 vim.keymap.set('n', '<leader>ss', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
 vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
