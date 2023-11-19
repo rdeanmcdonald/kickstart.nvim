@@ -8,6 +8,7 @@ vim.g.maplocalleader = ' '
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+vim.g.zig_fmt_autosave = 0
 
 -- Vafgnyy cnpxntr znantre
 --    https://github.com/folke/lazy.nvim
@@ -376,6 +377,9 @@ vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
 vim.keymap.set('n', '<leader>o', '<CMD>Neotree filesystem reveal left<CR>', { desc = 'Open neotree' })
 vim.keymap.set('n', '<leader>c', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open oil" })
+-- vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+-- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+vim.keymap.set("n", "go", "<c-o>", { desc = "Go to last cursor position (go-old)" })
 -- WINDOWS
 vim.keymap.set("n", "<leader>wh", "<c-w>h", { desc = "Window left" })
 vim.keymap.set("n", "<leader>wl", "<c-w>l", { desc = "Window right" })
