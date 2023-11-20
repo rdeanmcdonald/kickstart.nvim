@@ -34,6 +34,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
 
   -- START MINE
+  'dhruvasagar/vim-table-mode',
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
   'ziglang/zig.vim',
@@ -53,25 +54,25 @@ require('lazy').setup({
     end,
   },
   "MunifTanjim/nui.nvim",
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    version = "*",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-    },
-    config = function()
-      require('neo-tree').setup({})
-    end,
-  },
   -- {
-  --   'nvim-tree/nvim-tree.lua',
-  --   version = "*", -- Use for stability; omit to use `main` branch for the latest features
-  --   event = 'VeryLazy',
-  --   opts = {},
-  --   config = true
+  --   "nvim-neo-tree/neo-tree.nvim",
+  --   version = "*",
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+  --     "MunifTanjim/nui.nvim",
+  --   },
+  --   config = function()
+  --     require('neo-tree').setup({})
+  --   end,
   -- },
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
+    opts = {},
+    config = true
+  },
   {
     'kylechui/nvim-surround',
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -91,7 +92,28 @@ require('lazy').setup({
   },
   {
     'stevearc/oil.nvim',
-    opts = {},
+    opts = {
+      keymaps = {
+        ["g?"] = "actions.show_help",
+        ["<CR>"] = "actions.select",
+        ["<C-s>"] = "actions.select_vsplit",
+        ["<C-h>"] = "actions.select_split",
+        ["<C-t>"] = "actions.select_tab",
+        ["<C-p>"] = "actions.preview",
+        ["<C-c>"] = "actions.close",
+        ["<C-l>"] = "actions.refresh",
+        ["<"] = "actions.parent",
+        [">"] = "actions.select",
+        ["_"] = "actions.open_cwd",
+        ["`"] = "actions.cd",
+        ["~"] = "actions.tcd",
+        ["gs"] = "actions.change_sort",
+        ["gx"] = "actions.open_external",
+        ["g."] = "actions.toggle_hidden",
+        -- ["gyr"] = "actions.toggle_hidden",
+        ["gya"] = "actions.copy_entry_path",
+      }
+    },
     -- Optional dependencies
     dependencies = { "nvim-tree/nvim-web-devicons" },
   },
@@ -371,15 +393,15 @@ end
 -- [[ Basic Keymaps ]]
 
 -- START MINE
+-- KITCHEN SINK
 vim.keymap.set('v', 'p', '<s-p>', { desc = 'Paste' }) -- paste not override register
 vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
-vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
-vim.keymap.set('n', '<leader>o', '<CMD>Neotree filesystem reveal left<CR>', { desc = 'Open neotree' })
-vim.keymap.set('n', '<leader>c', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open oil" })
--- vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
--- vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 vim.keymap.set("n", "go", "<c-o>", { desc = "Go to last cursor position (go-old)" })
+vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+-- vim.keymap.set('n', '<leader>o', '<CMD>Neotree filesystem reveal left<CR>', { desc = 'Open neotree' })
+-- vim.keymap.set('n', '<leader>c', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
+vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
 -- WINDOWS
 vim.keymap.set("n", "<leader>wh", "<c-w>h", { desc = "Window left" })
 vim.keymap.set("n", "<leader>wl", "<c-w>l", { desc = "Window right" })
@@ -471,7 +493,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
   ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-    'zig', 'terraform', 'scala' },
+    'zig', 'terraform', 'scala', 'json' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
