@@ -37,7 +37,6 @@ require('lazy').setup({
   'dhruvasagar/vim-table-mode',
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
-  'ziglang/zig.vim',
   {
     "windwp/nvim-autopairs",
     -- Optional dependency
@@ -739,13 +738,9 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   group = nvim_metals_group,
 })
 
-local lspconfig = require("lspconfig")
-local servers2 = { "zls" }
-for _, lsp in ipairs(servers2) do
-  lspconfig[lsp].setup {
+require("lspconfig").zls.setup {
     on_attach = on_attach,
-  }
-end
+}
 
 -- END MINE
 
