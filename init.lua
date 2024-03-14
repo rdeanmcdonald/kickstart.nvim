@@ -166,6 +166,15 @@ require('lazy').setup({
       require("gruvbox").setup()
     end,
   },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+  },
   -- END MINE
 
   -- Detect tabstop and shiftwidth automatically
@@ -301,12 +310,13 @@ require('lazy').setup({
       -- requirements installed.
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
         build = 'make',
         cond = function()
           return vim.fn.executable 'make' == 1
         end,
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
       },
     },
   },
@@ -398,6 +408,12 @@ vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open oil" })
 vim.keymap.set("n", "go", "<c-o>", { desc = "Go to last cursor position (go-old)" })
 vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+-- Move lines up and down, keeping indent correct
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '>-2<CR>gv=gv")
+-- Keep line in middle of screen when moving next
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
 -- vim.keymap.set('n', '<leader>o', '<CMD>Neotree filesystem reveal left<CR>', { desc = 'Open neotree' })
 -- vim.keymap.set('n', '<leader>c', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
 vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
@@ -420,10 +436,13 @@ vim.keymap.set("n", "<leader>bs", "<CMD>enew<CR>", { desc = "Scratch buffer" })
 -- FILES
 vim.keymap.set("n", "<leader>fs", ":w<CR>", { desc = "Save file" })
 vim.keymap.set('n', '<leader>ff', "<CMD>Format<CR>", { desc = 'Format file' })
-vim.keymap.set('n', '<leader>pf', "<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>", { desc = 'Project files' })
+vim.keymap.set('n', '<leader>pf', "<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>",
+  { desc = 'Project files' })
 -- SEARCH
 vim.keymap.set('n', '<leader>ss', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
-vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+-- vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+vim.keymap.set("n", '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>',
+  { desc = 'Search project' })
 vim.keymap.set('n', '<leader>*', '<CMD>Telescope grep_string<CR>', { desc = 'Search project for word under cursor' })
 vim.keymap.set('v', '<leader>*', function()
   local text = vim.getVisualSelection()
@@ -465,8 +484,8 @@ require('telescope').setup {
   },
 }
 
--- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
+pcall(require('telescope').load_extension, 'live_grep_args')
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
