@@ -379,6 +379,15 @@ require('lazy').setup({
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
+      -- MINE
+      {
+        'scalameta/nvim-metals',
+        -- ft = { 'scala', 'sbt' },
+        dependencies = {
+          'nvim-lua/plenary.nvim',
+        },
+      },
+      -- END MINE
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -531,6 +540,25 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- MINE
+      local metals_config = require('metals').bare_config()
+      metals_config.settings = {
+        showImplicitArguments = true,
+        showImplicitConversionsAndClasses = true,
+        showInferredType = true,
+        superMethodLensesEnabled = true,
+      }
+      metals_config.init_options.statusBarProvider = 'on'
+      metals_config.capabilities = capabilities
+
+      vim.api.nvim_create_autocmd({ 'FileType' }, {
+        pattern = { 'scala', 'sbt' },
+        callback = function()
+          require('metals').initialize_or_attach(metals_config)
+        end,
+        group = vim.api.nvim_create_augroup('nvim-metals', { clear = true }),
+      })
     end,
   },
 
