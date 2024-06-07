@@ -91,16 +91,19 @@ vim.keymap.set('n', '<leader>bs', '<CMD>enew<CR>', { desc = 'Scratch buffer' })
 -- FILES
 vim.keymap.set('n', '<leader>fs', ':w<CR>', { desc = 'Save file' })
 vim.keymap.set('n', '<leader>ff', '<CMD>Format<CR>', { desc = 'Format file' })
-vim.keymap.set('n', '<leader>pf', '<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>', { desc = 'Project files' })
+vim.keymap.set('n', '<leader>pf', '<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>', { desc = '[P]roject [F]iles' })
 -- SEARCH
-vim.keymap.set('n', '<leader>ss', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
--- vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
-vim.keymap.set('n', '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>', { desc = 'Search project' })
+vim.keymap.set('n', '<leader>/', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
+vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+-- vim.keymap.set('n', '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>', { desc = 'Search project' })
 vim.keymap.set('n', '<leader>*', '<CMD>Telescope grep_string<CR>', { desc = 'Search project for word under cursor' })
 vim.keymap.set('v', '<leader>*', function()
   local text = vim.getVisualSelection()
   require('telescope.builtin').live_grep { default_text = text }
 end, { desc = 'Search project for selected text' })
+
+-- allows filtering the quickfix list
+vim.api.nvim_command 'packadd cfilter'
 -- END MINE
 
 -- [[ Basic Keymaps ]]
@@ -291,6 +294,12 @@ require('lazy').setup({
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+
+      -- MINE
+      {
+        'nvim-telescope/telescope-live-grep-args.nvim',
+      },
+      -- END MINE
     },
     config = function()
       --  :Telescope help_tags
@@ -308,8 +317,18 @@ require('lazy').setup({
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
         defaults = {
+          -- MINE
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+          },
           layout_strategy = 'vertical',
           layout_config = { width = 0.95, height = 0.95, preview_cutoff = 2 },
           mappings = {
@@ -318,6 +337,7 @@ require('lazy').setup({
               ['<C-d>'] = false,
             },
           },
+          -- END MINE
         },
         -- pickers = {}
         extensions = {
@@ -330,6 +350,9 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      -- MINE
+      pcall(require('telescope').load_extension, 'live_grep_args')
+      -- END MINE
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -345,13 +368,15 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
+      -- MINE (comment out)
+      -- vim.keymap.set('n', '<leader>/', function()
+      --   -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+      --   builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+      --     winblend = 10,
+      --     previewer = false,
+      --   })
+      -- end, { desc = '[/] Fuzzily search in current buffer' })
+      -- END MINE
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -595,11 +620,12 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'isort', 'black' },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { 'prettierd' },
+        typescript = { 'prettierd' },
       },
     },
   },
