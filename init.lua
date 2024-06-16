@@ -530,7 +530,6 @@ require('lazy').setup({
         -- tsserver ={},
         --
 
-        zls = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -589,6 +588,11 @@ require('lazy').setup({
         end,
         group = vim.api.nvim_create_augroup('nvim-metals', { clear = true }),
       })
+      local zls_server = {
+        capabilities = vim.tbl_deep_extend('force', {}, capabilities, {}),
+      }
+      require('lspconfig').zls.setup(zls_server)
+      -- END MINE
     end,
   },
 
