@@ -108,6 +108,20 @@ vim.api.nvim_command 'packadd cfilter'
 -- vim.api.nvim_add_user_command('CopyRelPath', "call setreg('+', expand('%'))", {})
 vim.keymap.set('n', '<leader>yy', "<CMD>call setreg('+', expand('%'))<CR>", { desc = 'Copy file relative path' })
 vim.keymap.set('n', '<leader>yY', "<CMD>call setreg('+', expand('%:p'))<CR>", { desc = 'Copy file relative path' })
+
+function vim.getVisualSelection()
+  vim.cmd 'noau normal! "vy"'
+  local text = vim.fn.getreg 'v'
+  vim.fn.setreg('v', {})
+
+  text = string.gsub(text, '\n', '')
+  if #text > 0 then
+    return text
+  else
+    return ''
+  end
+end
+
 -- END MINE
 
 -- [[ Basic Keymaps ]]
