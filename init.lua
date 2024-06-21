@@ -104,6 +104,10 @@ end, { desc = 'Search project for selected text' })
 
 -- allows filtering the quickfix list
 vim.api.nvim_command 'packadd cfilter'
+-- copy relative path!
+-- vim.api.nvim_add_user_command('CopyRelPath', "call setreg('+', expand('%'))", {})
+vim.keymap.set('n', '<leader>yy', "<CMD>call setreg('+', expand('%'))<CR>", { desc = 'Copy file relative path' })
+vim.keymap.set('n', '<leader>yY', "<CMD>call setreg('+', expand('%:p'))<CR>", { desc = 'Copy file relative path' })
 -- END MINE
 
 -- [[ Basic Keymaps ]]
@@ -232,6 +236,18 @@ require('lazy').setup({
     },
     -- Optional dependencies
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+  },
+  {
+    'windwp/nvim-autopairs',
+    -- Optional dependency
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require('nvim-autopairs').setup {}
+      -- If you want to automatically add `(` after selecting a function or method
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
   },
   -- END MINE
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
