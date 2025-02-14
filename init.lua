@@ -196,7 +196,7 @@ require('lazy').setup({
         ['<C-t>'] = 'actions.select_tab',
         ['<C-p>'] = 'actions.preview',
         ['<C-c>'] = 'actions.close',
-        ['<C-l>'] = 'actions.refresh',
+        ['<M-l>'] = 'actions.refresh',
         ['<'] = 'actions.parent',
         ['>'] = 'actions.select',
         ['_'] = 'actions.open_cwd',
@@ -221,7 +221,6 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim', -- required
       'nvim-telescope/telescope.nvim', -- optional
       'sindrets/diffview.nvim', -- optional
-      'ibhagwan/fzf-lua', -- optional
     },
     config = true,
   },
@@ -262,6 +261,31 @@ require('lazy').setup({
       local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
       local cmp = require 'cmp'
       cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
+  },
+  {
+    'nvim-java/nvim-java',
+    dependencies = {
+      'nvim-java/lua-async-await',
+      'nvim-java/nvim-java-refactor',
+      'nvim-java/nvim-java-core',
+      'nvim-java/nvim-java-test',
+      'nvim-java/nvim-java-dap',
+      'MunifTanjim/nui.nvim',
+      'neovim/nvim-lspconfig',
+      'mfussenegger/nvim-dap',
+      {
+        'williamboman/mason.nvim',
+        opts = {
+          registries = {
+            'github:nvim-java/mason-registry',
+            'github:mason-org/mason-registry',
+          },
+        },
+      },
+    },
+    config = function()
+      require('java').setup()
     end,
   },
   -- END MINE
@@ -615,6 +639,21 @@ require('lazy').setup({
             },
           },
         },
+        jdtls = {
+          settings = {
+            java = {
+              configuration = {
+                runtimes = {
+                  {
+                    name = 'sdkman default',
+                    path = '~/.sdkman/candidates/java/current/bin/java',
+                    default = true,
+                  },
+                },
+              },
+            },
+          },
+        },
       }
 
       -- Ensure the servers and tools above are installed
@@ -708,6 +747,7 @@ require('lazy').setup({
         python = { 'isort', 'black' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
         typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        java = { 'google-java-format' },
       },
     },
   },
