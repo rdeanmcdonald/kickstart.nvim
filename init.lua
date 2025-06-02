@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -159,8 +159,77 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
+vim.o.scrolloff = 0
 
+-- MINE
+-- FOLDING WITH TREESITTER
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+
+-- KEY MAPS
+-- KITCHEN SINK
+vim.keymap.set('v', 'p', '<s-p>', { desc = 'Paste' }) -- paste not override register
+vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open oil' })
+vim.keymap.set('n', 'go', '<c-o>', { desc = 'Go to last cursor position (go-old)' })
+vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
+-- Move lines up and down, keeping indent correct
+vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
+vim.keymap.set('v', 'K', ":m '>-2<CR>gv=gv")
+-- Keep line in middle of screen when moving next
+vim.keymap.set('n', 'n', 'nzzzv')
+vim.keymap.set('n', 'N', 'Nzzzv')
+vim.keymap.set('n', '<leader>gg', '<CMD>Neogit<CR>', { desc = 'Open Neogit' })
+-- WINDOWS
+vim.keymap.set('n', '<leader>wh', '<c-w>h', { desc = 'Window left' })
+vim.keymap.set('n', '<leader>wl', '<c-w>l', { desc = 'Window right' })
+vim.keymap.set('n', '<leader>wj', '<c-w>j', { desc = 'Window down' })
+vim.keymap.set('n', '<leader>wk', '<c-w>k', { desc = 'Window up' })
+vim.keymap.set('n', '<leader>wd', '<c-w>q', { desc = 'Window delete' })
+-- BUFFERS
+vim.keymap.set('n', '<leader>l', function()
+  require('telescope.builtin').buffers { sort_mru = true, ignore_current_buffer = true }
+end, { desc = 'Last buffer (first in the list)' })
+vim.keymap.set('n', '<leader>bb', '<CMD>Telescope buffers<CR>', { desc = 'Find buffer' })
+vim.keymap.set('n', '<leader>bd', '<CMD>bdelete<CR>', { desc = 'Delete buffer' })
+vim.keymap.set('n', '<leader>bc', '<CMD>%bd | e# | bd# <CR>', { desc = 'Clean up buffers' })
+vim.keymap.set('n', '<leader>bK', '<CMD>bdelete!<CR>', { desc = 'Force kill a buffer' })
+vim.keymap.set('n', '<leader>bs', '<CMD>enew<CR>', { desc = 'Scratch buffer' })
+-- FILES
+vim.keymap.set('n', '<leader>fs', ':w<CR>', { desc = 'Save file' })
+vim.keymap.set('n', '<leader>ff', '<CMD>Format<CR>', { desc = 'Format file' })
+vim.keymap.set('n', '<leader>pf', '<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>', { desc = '[P]roject [F]iles' })
+-- SEARCH
+vim.keymap.set('n', '<leader>/', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
+-- vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+vim.keymap.set('n', '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>', { desc = 'Search project' })
+vim.keymap.set('n', '<leader>*', '<CMD>Telescope grep_string<CR>', { desc = 'Search project for word under cursor' })
+vim.keymap.set('v', '<leader>*', function()
+  local text = vim.getVisualSelection()
+  require('telescope.builtin').live_grep { default_text = text }
+end, { desc = 'Search project for selected text' })
+
+-- allows filtering the quickfix list
+vim.api.nvim_command 'packadd cfilter'
+-- copy relative path!
+-- vim.api.nvim_add_user_command('CopyRelPath', "call setreg('+', expand('%'))", {})
+vim.keymap.set('n', '<leader>yy', "<CMD>call setreg('+', expand('%'))<CR>", { desc = 'Copy file relative path' })
+vim.keymap.set('n', '<leader>yY', "<CMD>call setreg('+', expand('%:p'))<CR>", { desc = 'Copy file relative path' })
+
+function vim.getVisualSelection()
+  vim.cmd 'noau normal! "vy"'
+  local text = vim.fn.getreg 'v'
+  vim.fn.setreg('v', {})
+
+  text = string.gsub(text, '\n', '')
+  if #text > 0 then
+    return text
+  else
+    return ''
+  end
+end
+
+-- END MINE
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
@@ -194,10 +263,10 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -271,6 +340,73 @@ require('lazy').setup({
   -- options to `gitsigns.nvim`.
   --
   -- See `:help gitsigns` to understand what the configuration keys do
+  -- MINE
+  'dhruvasagar/vim-table-mode',
+  'sindrets/diffview.nvim',
+  'nvim-tree/nvim-web-devicons',
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
+      'nvim-telescope/telescope.nvim', -- optional
+      'sindrets/diffview.nvim', -- optional
+    },
+    config = true,
+  },
+  {
+    'stevearc/oil.nvim',
+    opts = {
+      keymaps = {
+        ['g?'] = 'actions.show_help',
+        ['<CR>'] = 'actions.select',
+        ['<C-s>'] = 'actions.select_vsplit',
+        ['<C-h>'] = 'actions.select_split',
+        ['<C-t>'] = 'actions.select_tab',
+        ['<C-p>'] = 'actions.preview',
+        ['<C-c>'] = 'actions.close',
+        ['<C-l>'] = 'actions.refresh',
+        ['<'] = 'actions.parent',
+        ['>'] = 'actions.select',
+        ['_'] = 'actions.open_cwd',
+        ['`'] = 'actions.cd',
+        ['~'] = 'actions.tcd',
+        ['gs'] = 'actions.change_sort',
+        ['gx'] = 'actions.open_external',
+        ['g.'] = 'actions.toggle_hidden',
+        -- ["gyr"] = "actions.toggle_hidden",
+        ['gya'] = 'actions.copy_entry_path',
+      },
+    },
+    -- Optional dependencies
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+  },
+  {
+    'nvim-java/nvim-java',
+    dependencies = {
+      'nvim-java/lua-async-await',
+      'nvim-java/nvim-java-refactor',
+      'nvim-java/nvim-java-core',
+      'nvim-java/nvim-java-test',
+      'nvim-java/nvim-java-dap',
+      'MunifTanjim/nui.nvim',
+      'neovim/nvim-lspconfig',
+      'mfussenegger/nvim-dap',
+      {
+        'williamboman/mason.nvim',
+        opts = {
+          registries = {
+            'github:nvim-java/mason-registry',
+            'github:mason-org/mason-registry',
+          },
+        },
+      },
+    },
+    config = function()
+      require('java').setup()
+    end,
+  },
+  -- END MINE
+  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -379,6 +515,13 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
+
+      -- MINE
+      {
+        'nvim-telescope/telescope-live-grep-args.nvim',
+      },
+      -- END MINE
+
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
@@ -406,12 +549,26 @@ require('lazy').setup({
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          -- MINE
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+          },
+          layout_strategy = 'vertical',
+          layout_config = { width = 0.95, height = 0.95, preview_cutoff = 2 },
+          file_ignore_patterns = { '*lock.json' },
+          -- END MINE
+          mappings = {
+            i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -423,6 +580,9 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      -- MINE
+      pcall(require('telescope').load_extension, 'live_grep_args')
+      -- END MINE
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -438,13 +598,15 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
+      -- MINE (comment out)
+      -- vim.keymap.set('n', '<leader>/', function()
+      --   -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+      --   builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+      --     winblend = 10,
+      --     previewer = false,
+      --   })
+      -- end, { desc = '[/] Fuzzily search in current buffer' })
+      -- END MINE
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -488,6 +650,16 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
+
+      -- MINE
+      {
+        'scalameta/nvim-metals',
+        -- ft = { 'scala', 'sbt' },
+        dependencies = {
+          'nvim-lua/plenary.nvim',
+        },
+      },
+      -- END MINE
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
@@ -673,7 +845,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -681,7 +853,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -697,6 +869,27 @@ require('lazy').setup({
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
+        },
+        jdtls = {
+          settings = {
+            java = {
+              configuration = {
+                runtimes = {
+                  {
+                    name = 'sdkman default',
+                    path = '~/.sdkman/candidates/java/current/bin/java',
+                    default = true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        gopls = {
+          settings = {},
+        },
+        gofumpt = {
+          settings = {},
         },
       }
 
@@ -733,6 +926,30 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- MINE
+      local metals_config = require('metals').bare_config()
+      metals_config.settings = {
+        showImplicitArguments = true,
+        showImplicitConversionsAndClasses = true,
+        showInferredType = true,
+        superMethodLensesEnabled = true,
+      }
+      metals_config.init_options.statusBarProvider = 'on'
+      metals_config.capabilities = capabilities
+
+      vim.api.nvim_create_autocmd({ 'FileType' }, {
+        pattern = { 'scala', 'sbt' },
+        callback = function()
+          require('metals').initialize_or_attach(metals_config)
+        end,
+        group = vim.api.nvim_create_augroup('nvim-metals', { clear = true }),
+      })
+      local zls_server = {
+        capabilities = vim.tbl_deep_extend('force', {}, capabilities, {}),
+      }
+      require('lspconfig').zls.setup(zls_server)
+      -- END MINE
     end,
   },
 
@@ -769,10 +986,13 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'isort', 'black' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        java = { 'google-java-format' },
+        go = { 'gofumpt' },
       },
     },
   },
@@ -835,7 +1055,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'enter',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -851,6 +1071,7 @@ require('lazy').setup({
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
         documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        accept = { auto_brackets = { enabled = true } },
       },
 
       sources = {
@@ -869,7 +1090,7 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
@@ -944,7 +1165,31 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'vim',
+        'vimdoc',
+        'zig',
+        'scala',
+        'javascript',
+        'typescript',
+        'tsx',
+        'python',
+        'java',
+        'hcl',
+        'json',
+        'yaml',
+        'go',
+        'gomod',
+        'gowork',
+        'gosum',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -976,7 +1221,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
