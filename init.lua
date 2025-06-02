@@ -701,6 +701,12 @@ require('lazy').setup({
             },
           },
         },
+        gopls = {
+          settings = {},
+        },
+        gofumpt = {
+          settings = {},
+        },
       }
 
       -- Ensure the servers and tools above are installed
@@ -800,6 +806,7 @@ require('lazy').setup({
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
         typescript = { 'prettierd', 'prettier', stop_after_first = true },
         java = { 'google-java-format' },
+        go = { 'gofumpt' },
       },
     },
   },
@@ -997,6 +1004,10 @@ require('lazy').setup({
         'hcl',
         'json',
         'yaml',
+        'go',
+        'gomod',
+        'gowork',
+        'gosum',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
