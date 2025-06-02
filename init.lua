@@ -96,8 +96,8 @@ vim.keymap.set('n', '<leader>ff', '<CMD>Format<CR>', { desc = 'Format file' })
 vim.keymap.set('n', '<leader>pf', '<CMD>Telescope find_files find_command=rg,--hidden,--files,--iglob,!.git<CR>', { desc = '[P]roject [F]iles' })
 -- SEARCH
 vim.keymap.set('n', '<leader>/', '<CMD>Telescope current_buffer_fuzzy_find<CR>', { desc = 'Search buffer' })
-vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
--- vim.keymap.set('n', '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>', { desc = 'Search project' })
+-- vim.keymap.set('n', '<leader>sp', '<CMD>Telescope live_grep<CR>', { desc = 'Search project' })
+vim.keymap.set('n', '<leader>sp', ':lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>', { desc = 'Search project' })
 vim.keymap.set('n', '<leader>*', '<CMD>Telescope grep_string<CR>', { desc = 'Search project for word under cursor' })
 vim.keymap.set('v', '<leader>*', function()
   local text = vim.getVisualSelection()
@@ -415,6 +415,7 @@ require('lazy').setup({
           },
           layout_strategy = 'vertical',
           layout_config = { width = 0.95, height = 0.95, preview_cutoff = 2 },
+          file_ignore_patterns = { '*lock.json' },
           -- END MINE
           mappings = {
             i = { ['<c-enter>'] = 'to_fuzzy_refine' },
