@@ -164,7 +164,8 @@ vim.o.scrolloff = 0
 -- MINE
 -- FOLDING WITH TREESITTER
 vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldtext = 'v:lua.vim.treesitter.foldtext()'
 
 -- KEY MAPS
 -- KITCHEN SINK
@@ -1179,7 +1180,7 @@ require('lazy').setup({
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
       },
-      indent = { enable = true, disable = { 'ruby' } },
+      indent = { enable = true, disable = { 'ruby' }, fold = { enable = true } },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
