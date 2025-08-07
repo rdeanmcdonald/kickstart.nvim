@@ -164,8 +164,7 @@ vim.o.scrolloff = 0
 -- MINE
 -- FOLDING WITH TREESITTER
 vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldtext = 'v:lua.vim.treesitter.foldtext()'
+vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
 
 -- KEY MAPS
 -- KITCHEN SINK
@@ -174,7 +173,6 @@ vim.keymap.set('i', 'kj', '<ESC>', { desc = 'Escape insert mode' })
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open oil' })
 vim.keymap.set('n', 'go', '<c-o>', { desc = 'Go to last cursor position (go-old)' })
 vim.keymap.set('n', '<leader>o', '<CMD>NvimTreeFindFileToggle<CR>', { desc = 'Toggle nvim-tree' })
--- Move lines up and down, keeping indent correct
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '>-2<CR>gv=gv")
 -- Keep line in middle of screen when moving next
@@ -634,8 +632,6 @@ require('lazy').setup({
         },
       },
 
-      'nvim-java/nvim-java',
-
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
     },
@@ -844,21 +840,7 @@ require('lazy').setup({
             },
           },
         },
-        jdtls = {
-          settings = {
-            java = {
-              configuration = {
-                runtimes = {
-                  {
-                    name = 'sdkman default',
-                    path = '~/.sdkman/candidates/java/current/bin/java',
-                    default = true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        jdtls = {},
         gopls = {
           settings = {},
         },
@@ -890,13 +872,6 @@ require('lazy').setup({
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
         handlers = {
-          jdtls = function()
-            require('java').setup {
-              jdk = {
-                auto_install = false,
-              },
-            }
-          end,
           function(server_name)
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
@@ -1096,7 +1071,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'tokyonight-storm'
     end,
   },
 
