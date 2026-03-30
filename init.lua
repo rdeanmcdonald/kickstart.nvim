@@ -343,6 +343,7 @@ require('lazy').setup({
   'dhruvasagar/vim-table-mode',
   'sindrets/diffview.nvim',
   'nvim-tree/nvim-web-devicons',
+  'hedengran/fga.nvim',
   {
     'NeogitOrg/neogit',
     dependencies = {
@@ -877,8 +878,8 @@ require('lazy').setup({
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+            -- server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            vim.lsp.config(server_name).setup(server)
           end,
         },
       }
@@ -892,7 +893,7 @@ require('lazy').setup({
         superMethodLensesEnabled = true,
       }
       metals_config.init_options.statusBarProvider = 'on'
-      metals_config.capabilities = capabilities
+      -- metals_config.capabilities = capabilities
 
       vim.api.nvim_create_autocmd({ 'FileType' }, {
         pattern = { 'scala', 'sbt' },
@@ -902,9 +903,10 @@ require('lazy').setup({
         group = vim.api.nvim_create_augroup('nvim-metals', { clear = true }),
       })
       local zls_server = {
-        capabilities = vim.tbl_deep_extend('force', {}, capabilities, {}),
+        -- capabilities = vim.tbl_deep_extend('force', {}, capabilities, {}),
       }
-      require('lspconfig').zls.setup(zls_server)
+      -- this might be wrong? need zig on my system to check
+      vim.lsp.config('zls', zls_server)
       -- END MINE
     end,
   },
@@ -929,7 +931,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, javascript = true, typescript = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
