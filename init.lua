@@ -792,7 +792,14 @@ require('lazy').setup({
             Lua = {},
           },
         },
-        jdtls = {},
+        jdtls = {
+          cmd = {
+            'jdtls',
+            '--jvm-arg=-javaagent:' .. vim.fn.expand '~/.local/share/nvim/mason/packages/jdtls/lombok.jar',
+            '-data',
+            vim.fn.expand '~/.cache/jdtls/' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':t'),
+          },
+        },
         gopls = {
           settings = {},
         },
