@@ -795,9 +795,17 @@ require('lazy').setup({
         jdtls = {
           cmd = {
             'jdtls',
+            -- JAVA_HOME is not set in the macOS GUI environment (SDKMAN only sets it in
+            -- interactive shells). Hardcode the SDKMAN current symlink instead.
+            '--java-executable=' .. vim.fn.expand '~/.sdkman/candidates/java/current/bin/java',
             '--jvm-arg=-javaagent:' .. vim.fn.expand '~/.local/share/nvim/mason/packages/jdtls/lombok.jar',
             '-data',
             vim.fn.expand '~/.cache/jdtls/' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':t'),
+          },
+          settings = {
+            java = {
+              autobuild = { enabled = false },
+            },
           },
         },
         gopls = {
